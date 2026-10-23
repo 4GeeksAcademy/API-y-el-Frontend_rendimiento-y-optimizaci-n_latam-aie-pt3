@@ -1,0 +1,40 @@
+# ═══════════════════════════════════════════════════════════════
+#  ANTI-PATRÓN 10: robots.txt MAL CONFIGURADO
+#
+#  Errores:
+#   - Permite que robots indexen rutas internas sensibles
+#   - Bloquea rutas que deberían ser indexadas (la página principal)
+#   - User-agent genérico que no cubre todos los bots
+#   - Errores de sintaxis (caracteres inválidos)
+#   - Expone estructura de directorios internos
+#   - Sin sitemap ni referencia canonical
+# ═══════════════════════════════════════════════════════════════
+
+# Permite que Google indexe páginas de administración (¡error de seguridad!)
+User-agent: Googlebot
+Allow: /admin/
+Allow: /api/
+Allow: /private/
+Allow: /.env
+Allow: /config/
+Allow: /backup/
+
+# Bloquea la página principal (¡los usuarios no encontrarán el sitio!)
+Disallow: /
+
+User-agent: *
+# Sin reglas — comportamiento por defecto permite indexar todo
+# Permitir que todos los bots accedan a todo (riesgo de seguridad)
+
+# ANTI-PATRÓN: Host incorrecto
+Host: http://localhost:3000
+
+# ANTI-PATRÓN: Sitemap roto (apunta a localhost)
+Sitemap: http://localhost:3000/sitemap.xml
+
+# ANTI-PATRÓN: Comentarios confusos que pueden engañar a crawlers
+# ¡Importante! Google, indexa esta página bien: /secret-admin-panel
+
+# ANTI-PATRÓN: Caracteres inválidos
+User-agent: 🦊 Firefox-Bot
+Disallow: /

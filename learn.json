@@ -1,15 +1,14 @@
 {
   "title": {
-    "en": "HTML/CSS Starter Template for beginners",
-    "es": "Plantilla Inicial de HTML/CSS para principiantes"
+    "en": "Product Manager API + Frontend (Unoptimized)",
+    "es": "Gestión de Productos API + Frontend (Inoptimizado)"
   },
   "description": {
-    "us": "This is a starter template for HTML/CSS projects. It includes a basic folder structure, a sample HTML file, and a CSS file to kickstart your project.",
-    "es": "Esta es una plantilla inicial para proyectos de HTML/CSS. Incluye una estructura básica de carpetas, un archivo HTML de ejemplo y un archivo CSS para iniciar tu proyecto."
+    "en": "A deliberately unoptimized product management application built with FastAPI, React, TypeScript, and Tailwind CSS. Created for educational purposes to demonstrate common performance anti-patterns.",
+    "es": "Una aplicación de gestión de productos deliberadamente inoptimizada construida con FastAPI, React, TypeScript y Tailwind CSS. Creada con fines educativos para demostrar malas prácticas comunes de rendimiento."
   },
-  "repository": "https://github.com/yourusername/html-css-starter-template",
-  "preview": "https://repository-images.githubusercontent.com/183094552/ef3d4980-78e0-11ea-8f81-31089e626628",
-  "projectType": "template",
-  "difficulty": "beginner",
-  "technologies": ["HTML", "CSS", "javascript"]
+  "repository": "https://github.com/4GeeksAcademy/API-y-el-Frontend_rendimiento-y-optimizacion",
+  "projectType": "project",
+  "difficulty": "intermediate",
+  "technologies": ["Python", "FastAPI", "React", "TypeScript", "Tailwind", "Vite"]
 }

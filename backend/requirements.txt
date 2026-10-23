@@ -1,0 +1,3 @@
+# Sin versiones fijas — cualquier versión vale, sin lockfile
+fastapi
+uvicorn
