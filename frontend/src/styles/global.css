@@ -1,224 +1,37 @@
-/* ═══════════════════════════════════════════════════════════════
-   ANTI-PATRÓN: CSS global enorme
-   - Sin purgar
-   - Sin comprimir
-   - Con reglas duplicadas
-   - Con selectores profundos innecesarios
-   - !important por todos lados
-   - Animaciones que consumen GPU
-   ═══════════════════════════════════════════════════════════════ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Reglas genéricas que aplican a todo sin necesidad */
-* {
-  margin: 0 !important;
-  padding: 0 !important;
-  box-sizing: border-box !important;
+@font-face {
+  font-family: "Public Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../assets/public-sans-latin.woff2") format("woff2");
 }
 
-/* Reset innecesario (Tailwind ya lo hace) */
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center, dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend, table, caption,
-tbody, tfoot, thead, tr, th, td, article, aside,
-canvas, details, embed, figure, figcaption, footer,
-header, hgroup, menu, nav, output, ruby, section,
-summary, time, mark, audio, video {
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
+@layer base {
+  :root {
+    color-scheme: light;
+    --surface: #f7f8fa;
+    --ink: #202724;
+    --line: #dce3df;
+  }
+  body { @apply font-sans; background: var(--surface); color: var(--ink); letter-spacing: 0; }
+  button, input, select { font: inherit; }
+  button, a, input, select, summary { -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 3px solid #1565c0; outline-offset: 4px; }
+  button:disabled { cursor: not-allowed; }
+  h1, h2, h3, p, dd { overflow-wrap: anywhere; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
 }
 
-/* ANTI-PATRÓN: Imágenes sin max-width → se desbordan */
-img {
-  /* Sin max-width: 100% — las imágenes se salen del contenedor */
-  height: auto;
+@layer components {
+  .page-shell { @apply mx-auto w-full max-w-[1440px] px-4 sm:px-8 lg:px-12; }
+  .control { @apply flex min-h-11 items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50; }
+  .primary-button { @apply control border-brand-600 bg-brand-600 text-white hover:bg-brand-700; }
+  .field { @apply min-h-11 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-800; }
+  .section-heading { @apply text-xl font-semibold; }
 }
-
-/* ANTI-PATRÓN: Animaciones costosas que no se necesitan */
-@keyframes fancy-spin {
-  0% { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
-  25% { transform: rotate(90deg) scale(1.1); filter: hue-rotate(90deg); }
-  50% { transform: rotate(180deg) scale(1.2); filter: hue-rotate(180deg); }
-  75% { transform: rotate(270deg) scale(1.1); filter: hue-rotate(270deg); }
-  100% { transform: rotate(360deg) scale(1); filter: hue-rotate(360deg); }
-}
-
-@keyframes rainbow-bg {
-  0% { background-color: #ff0000; }
-  16% { background-color: #ff8800; }
-  33% { background-color: #ffff00; }
-  50% { background-color: #00ff00; }
-  66% { background-color: #0088ff; }
-  83% { background-color: #8800ff; }
-  100% { background-color: #ff0000; }
-}
-
-.rainbow-bg {
-  animation: rainbow-bg 5s linear infinite !important;
-}
-
-.fancy-spin {
-  animation: fancy-spin 3s ease-in-out infinite !important;
-}
-
-/* ANTI-PATRÓN: Sombras excesivas que causan repaints */
-.card-shadow {
-  box-shadow:
-    0 0 0 1px rgba(0,0,0,0.05),
-    0 2px 4px rgba(0,0,0,0.1),
-    0 4px 8px rgba(0,0,0,0.1),
-    0 8px 16px rgba(0,0,0,0.1),
-    0 16px 32px rgba(0,0,0,0.1),
-    0 32px 64px rgba(0,0,0,0.1) !important;
-  border-radius: 8px;
-}
-
-/* ANTI-PATRÓN: Clases duplicadas innecesarias */
-.mt-1 { margin-top: 0.25rem !important; }
-.mt-2 { margin-top: 0.5rem !important; }
-.mt-3 { margin-top: 0.75rem !important; }
-.mt-4 { margin-top: 1rem !important; }
-.mt-5 { margin-top: 1.25rem !important; }
-.mt-6 { margin-top: 1.5rem !important; }
-.mt-8 { margin-top: 2rem !important; }
-.mt-10 { margin-top: 2.5rem !important; }
-.mt-12 { margin-top: 3rem !important; }
-.mt-16 { margin-top: 4rem !important; }
-.mt-20 { margin-top: 5rem !important; }
-
-.mb-1 { margin-bottom: 0.25rem !important; }
-.mb-2 { margin-bottom: 0.5rem !important; }
-.mb-3 { margin-bottom: 0.75rem !important; }
-.mb-4 { margin-bottom: 1rem !important; }
-.mb-5 { margin-bottom: 1.25rem !important; }
-.mb-6 { margin-bottom: 1.5rem !important; }
-.mb-8 { margin-bottom: 2rem !important; }
-.mb-10 { margin-bottom: 2.5rem !important; }
-.mb-12 { margin-bottom: 3rem !important; }
-.mb-16 { margin-bottom: 4rem !important; }
-.mb-20 { margin-bottom: 5rem !important; }
-
-.ml-1 { margin-left: 0.25rem !important; }
-.mr-1 { margin-right: 0.25rem !important; }
-
-.text-xs { font-size: 0.75rem !important; }
-.text-sm { font-size: 0.875rem !important; }
-.text-base { font-size: 1rem !important; }
-.text-lg { font-size: 1.125rem !important; }
-.text-xl { font-size: 1.25rem !important; }
-.text-2xl { font-size: 1.5rem !important; }
-.text-3xl { font-size: 1.875rem !important; }
-.text-4xl { font-size: 2.25rem !important; }
-.text-5xl { font-size: 3rem !important; }
-
-/* ANTI-PATRÓN: !important en todo */
-.p-0 { padding: 0 !important; }
-.p-1 { padding: 0.25rem !important; }
-.p-2 { padding: 0.5rem !important; }
-.p-3 { padding: 0.75rem !important; }
-.p-4 { padding: 1rem !important; }
-.p-5 { padding: 1.25rem !important; }
-.p-6 { padding: 1.5rem !important; }
-.p-8 { padding: 2rem !important; }
-
-.font-bold { font-weight: 700 !important; }
-.text-center { text-align: center !important; }
-.text-left { text-align: left !important; }
-.text-right { text-align: right !important; }
-
-.flex { display: flex !important; }
-.flex-wrap { flex-wrap: wrap !important; }
-.flex-col { flex-direction: column !important; }
-.justify-center { justify-content: center !important; }
-.justify-between { justify-content: space-between !important; }
-.items-center { align-items: center !important; }
-.gap-1 { gap: 0.25rem !important; }
-.gap-2 { gap: 0.5rem !important; }
-.gap-3 { gap: 0.75rem !important; }
-.gap-4 { gap: 1rem !important; }
-
-.w-full { width: 100% !important; }
-.h-full { height: 100% !important; }
-
-.bg-white { background-color: #ffffff !important; }
-.bg-gray-100 { background-color: #f5f5f5 !important; }
-.bg-gray-200 { background-color: #eeeeee !important; }
-.bg-blue-500 { background-color: #3b82f6 !important; }
-.bg-blue-600 { background-color: #2563eb !important; }
-.bg-green-500 { background-color: #22c55e !important; }
-.bg-red-500 { background-color: #ef4444 !important; }
-
-.text-white { color: #ffffff !important; }
-.text-gray-500 { color: #6b7280 !important; }
-.text-gray-600 { color: #4b5563 !important; }
-.text-gray-700 { color: #374151 !important; }
-.text-gray-800 { color: #1f2937 !important; }
-.text-blue-500 { color: #3b82f6 !important; }
-
-.rounded { border-radius: 0.25rem !important; }
-.rounded-lg { border-radius: 0.5rem !important; }
-.rounded-full { border-radius: 9999px !important; }
-
-.shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important; }
-.shadow-lg { box-shadow: 0 10px 15px rgba(0,0,0,0.1) !important; }
-
-.overflow-hidden { overflow: hidden !important; }
-.relative { position: relative !important; }
-.absolute { position: absolute !important; }
-
-/* ANTI-PATRÓN: Scrollbar personalizado con estilos forzados */
-::-webkit-scrollbar {
-  width: 16px !important;
-  height: 16px !important;
-}
-::-webkit-scrollbar-track {
-  background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet) !important;
-}
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea, #764ba2) !important;
-  border-radius: 8px !important;
-}
-
-/* ANTI-PATRÓN: Estilos para body con background-image grande */
-body {
-  background-image: url('https://picsum.photos/3840/2160');
-  background-size: cover;
-  background-attachment: fixed;
-  font-family: 'Roboto', sans-serif;
-}
-
-/* ANTI-PATRÓN: Animación de carga que parpadea */
-.loading-spinner {
-  width: 80px;
-  height: 80px;
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #3498db;
-  border-radius: 50%;
-  animation: fancy-spin 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
-}
-
-/* ANTI-PATRÓN: Muchos estilos sin usar */
-.never-used-class-1 { color: red; }
-.never-used-class-2 { color: blue; }
-.never-used-class-3 { color: green; }
-.never-used-class-4 { color: yellow; }
-.never-used-class-5 { color: purple; }
-.never-used-class-6 { color: orange; }
-.never-used-class-7 { color: pink; }
-.never-used-class-8 { color: brown; }
-.never-used-class-9 { color: cyan; }
-.never-used-class-10 { color: magenta; }
-.never-used-class-11 { color: lime; }
-.never-used-class-12 { color: indigo; }
-.never-used-class-13 { color: violet; }
-.never-used-class-14 { color: gold; }
-.never-used-class-15 { color: silver; }
-.never-used-class-16 { color: coral; }
-.never-used-class-17 { color: crimson; }
-.never-used-class-18 { color: darkblue; }
-.never-used-class-19 { color: darkgreen; }
-.never-used-class-20 { color: darkorange; }

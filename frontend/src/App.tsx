@@ -1,89 +1,60 @@
-// ──────────────────────────────────────────────────────────────
-//  ANTI-PATRÓN: Sin React.memo, sin useCallback, sin useMemo
-//  Sin lazy loading de rutas
-//  Sin lazy loading de componentes
-//  Sin Suspense
-//  Sin ErrorBoundary
-// ──────────────────────────────────────────────────────────────
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import Navbar, { type Page } from "./components/Navbar";
+import Spinner from "./components/Spinner";
 
-import ProductList from "./pages/ProductList";
-import StatsPage from "./pages/StatsPage";
+const ProductList = React.lazy(() => import("./pages/ProductList"));
+const StatsPage = React.lazy(() => import("./pages/StatsPage"));
+const getPage = (): Page => window.location.hash === "#stats" ? "stats" : "products";
+
+class ViewBoundary extends React.Component<{ children: React.ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() {
+    if (this.state.failed) return (
+      <div role="alert" className="py-16 text-center">
+        <h1 className="mb-4 text-xl font-semibold">No se pudo abrir esta vista</h1>
+        <button type="button" className="control mx-auto" onClick={() => window.location.reload()}>Volver a cargar</button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
 
 export default function App() {
-  const [page, setPage] = useState("products");
+  const [page, setPage] = useState<Page>(getPage);
+  const main = useRef<HTMLElement>(null);
+  const previousPage = useRef(page);
+
+  useEffect(() => {
+    const handleNavigation = () => {
+      if (window.location.hash === "#main-content") {
+        main.current?.focus();
+        return;
+      }
+      setPage(getPage());
+    };
+    window.addEventListener("hashchange", handleNavigation);
+    return () => window.removeEventListener("hashchange", handleNavigation);
+  }, []);
+
+  useEffect(() => {
+    document.title = `Inventario | ${page === "products" ? "Productos" : "Estadísticas"}`;
+    if (previousPage.current !== page) main.current?.focus({ preventScroll: true });
+    previousPage.current = page;
+  }, [page]);
 
   return (
-    <div>
-      {/* ANTI-PATRÓN: Navegación recargando todo el estado cada vez */}
-      <nav style={{
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        padding: "20px",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-      }}>
-        <h1 style={{
-          color: "white",
-          fontSize: "28px",
-          margin: 0,
-          fontFamily: "Impact, sans-serif",
-        }}>
-          🏪 Gestión de Productos (sin optimizar)
-        </h1>
-        <div style={{ marginTop: "12px", display: "flex", gap: "12px" }}>
-          <button
-            onClick={() => setPage("products")}
-            style={{
-              padding: "10px 24px",
-              background: page === "products" ? "#fff" : "transparent",
-              color: page === "products" ? "#667eea" : "#fff",
-              border: "2px solid #fff",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontWeight: "bold",
-              fontSize: "16px",
-            }}
-          >
-            📦 Productos
-          </button>
-          <button
-            onClick={() => setPage("stats")}
-            style={{
-              padding: "10px 24px",
-              background: page === "stats" ? "#fff" : "transparent",
-              color: page === "stats" ? "#667eea" : "#fff",
-              border: "2px solid #fff",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontWeight: "bold",
-              fontSize: "16px",
-            }}
-          >
-            📊 Estadísticas
-          </button>
-        </div>
-      </nav>
-
-      <main style={{ padding: "24px", minHeight: "100vh" }}>
-        {page === "products" && <ProductList />}
-        {page === "stats" && <StatsPage />}
+    <div className="flex min-h-screen flex-col">
+      <Navbar page={page} />
+      <main id="main-content" ref={main} tabIndex={-1} aria-label={page === "products" ? "Productos" : "Estadísticas"} className="page-shell flex-1 py-8 sm:py-10 focus-visible:outline-none">
+        <ViewBoundary key={page}>
+          <Suspense fallback={<Spinner label="Cargando vista" />}>
+            {page === "products" ? <ProductList /> : <StatsPage />}
+          </Suspense>
+        </ViewBoundary>
       </main>
-
-      {/* ANTI-PATRÓN: Footer con imágenes sin lazy loading */}
-      <footer style={{
-        background: "#1a1a2e",
-        color: "#fff",
-        padding: "40px 24px",
-        textAlign: "center",
-        marginTop: "40px",
-      }}>
-        <p>© 2026 Product Manager — Sin derechos reservados</p>
-        <div style={{ marginTop: "20px" }}>
-          <img src="https://picsum.photos/800/200?random=footer1" style={{ width: "100%", maxWidth: "300px", margin: "8px" }} />
-          <img src="https://picsum.photos/800/200?random=footer2" style={{ width: "100%", maxWidth: "300px", margin: "8px" }} />
-          <img src="https://picsum.photos/800/200?random=footer3" style={{ width: "100%", maxWidth: "300px", margin: "8px" }} />
-        </div>
+      <footer className="mt-10 border-t border-gray-200 bg-white py-5 text-xs text-gray-600">
+        <div className="page-shell flex flex-wrap justify-between gap-3"><p>Inventario · Gestión de productos</p><p>Precios expresados en USD</p></div>
       </footer>
     </div>
   );

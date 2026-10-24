@@ -1,66 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <!-- ═══════════════════════════════════════════════════════════
-       ANTI-PATRÓN 8: SIN metaetiquetas SEO correctas
-       - Sin charset
-       - Sin viewport
-       - Sin description
-       - Sin keywords
-       - Sin Open Graph
-       - Sin Twitter Cards
-       - Sin canonical
-       - Sin favicon
-       - Título genérico no descriptivo
-       ═══════════════════════════════════════════════════════ -->
-
-  <title>App</title>
-
-  <!-- CSS inline enorme sin comprimir (se repetirá en cada página) -->
-  <link rel="stylesheet" href="/src/styles/global.css">
-
-  <!-- ANTI-PATRÓN: Carga síncrona de Tailwind por CDN (sin async, sin diferir) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- ANTI-PATRÓN: Google Fonts sin display swap, bloquea el render -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@300;400;600;700;800&family=Lato:wght@100;300;400;700;900&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=block" rel="stylesheet">
-
-  <!-- ANTI-PATRÓN: Script analytics que bloquea la carga (carga síncrona) -->
-  <script>
-    // Finge ser un script de analytics pesado
-    const FAKE_ANALYTICS = [];
-    for (let i = 0; i < 1000; i++) {
-      FAKE_ANALYTICS.push({ id: i, timestamp: Date.now(), event: "load" });
-    }
-    console.log("Analytics loaded:", FAKE_ANALYTICS.length, "events");
-  </script>
-
-  <!-- Sin etiqueta <base> -->
-
-  <!-- Sin etiqueta <meta name="viewport">—la página no es responsive -->
-
-  <!-- Sin etiqueta <meta name="description">—Google no sabe de qué trata -->
-
-  <!-- Sin etiqueta <meta name="robots">—pero hay robots.txt mal configurado -->
-
-</head>
-<body>
-  <div id="app"></div>
-
-  <!-- ANTI-PATRÓN: Carga del script con type="module" pero sin async/defer -->
-  <script type="module" src="/src/index.js"></script>
-
-  <!-- ANTI-PATRÓN: Imágenes decorativas sin lazy loading, sin atributos
-       de tamaño, sin alt text, sin formato moderno (jpg gigante) -->
-  <div style="position:fixed; bottom:0; right:0; z-index:9999; opacity:0.1;">
-    <img src="https://picsum.photos/2400/1600?random=1">
-    <img src="https://picsum.photos/2400/1600?random=2">
-    <img src="https://picsum.photos/2400/1600?random=3">
-    <img src="https://picsum.photos/2400/1600?random=4">
-    <img src="https://picsum.photos/2400/1600?random=5">
-  </div>
-
-  <!-- ANTI-PATRÓN: iframe de página externa pesada -->
-  <iframe src="https://example.com" width="100%" height="600" style="display:none;"></iframe>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Consulta el catálogo de productos y las estadísticas de tu inventario." />
+    <title>Inventario | Productos</title>
+    <link rel="preload" href="/src/assets/public-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/src/assets/catalog-reference.jpg" as="image" fetchpriority="high" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
 </html>

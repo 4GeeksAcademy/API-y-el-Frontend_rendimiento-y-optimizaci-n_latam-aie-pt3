@@ -1,142 +1,57 @@
-// ──────────────────────────────────────────────────────────────
-//  ANTI-PATRÓN: Tarjeta de producto individual
-//   - Sin React.memo
-//   - Sin optimización de imágenes (src sin lazy loading, sin sizes)
-//   - Sin formato WebP/AVIF
-//   - Sin lazy loading
-//   - Renderiza todo en cada re-render del padre
-// ──────────────────────────────────────────────────────────────
-import React from "react";
+import { memo } from "react";
+import { ArrowUpRight, ImageOff, Star } from "lucide-react";
+import { moneyFormat, numberFormat, type Product } from "../api";
+import referenceImage from "../assets/catalog-reference.jpg";
 
-// ANTI-PATRÓN: Sin interface/type props definidos
+function getImageSource(source: string) {
+  if (!source) return referenceImage;
+  try {
+    const url = new URL(source, window.location.href);
+    return url.hostname === "placedog.net" ? referenceImage : url.href;
+  } catch {
+    return referenceImage;
+  }
+}
 
-export default function ProductCard({ product }) {
-  // ANTI-PATRÓN: Cálculos repetidos en cada render
-  const discount = Math.random() * 0.5;
-  const originalPrice = (product.price / (1 - discount)).toFixed(2);
-  const formattedDate = new Date(product.metadata?.created_at).toLocaleDateString();
-
+function ProductCard({ product, onSelect, priority = false }: { product: Product; onSelect: (product: Product) => void; priority?: boolean }) {
+  const imageSource = getImageSource(product.image_url);
   return (
-    <div
-      className="card-shadow"
-      style={{
-        width: "320px",
-        background: "#fff",
-        borderRadius: "12px",
-        overflow: "hidden",
-        transition: "all 0.3s ease",
-        border: "1px solid #e5e7eb",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "scale(1.05)";
-        e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.2)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
-        e.currentTarget.style.boxShadow = "none";
-      }}
-    >
-      {/* ANTI-PATRÓN: Imagen sin lazy loading, sin alt, sin sizes, jpg pesado */}
-      <img
-        src={product.image_url}
-        style={{ width: "320px", height: "240px", objectFit: "cover" }}
-      />
-
-      <div style={{ padding: "16px" }}>
-        <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "8px" }}>
-          {product.name}
-        </h3>
-
-        <p style={{ color: "#6b7280", fontSize: "14px", marginBottom: "4px" }}>
-          {product.category}
-        </p>
-
-        {/* ANTI-PATRÓN: Precio tachado + descuento falso */}
-        <div style={{ marginBottom: "8px" }}>
-          <span style={{ textDecoration: "line-through", color: "#9ca3af", fontSize: "14px" }}>
-            ${originalPrice}
-          </span>
-          <span style={{ color: "#ef4444", fontSize: "22px", fontWeight: "bold", marginLeft: "8px" }}>
-            ${product.price.toFixed(2)}
-          </span>
-          <span style={{ color: "#22c55e", fontSize: "12px", marginLeft: "6px" }}>
-            -{(discount * 100).toFixed(0)}%
-          </span>
-        </div>
-
-        {/* ANTI-PATRÓN: Rating con estrellitas generadas con un loop */}
-        <div style={{ marginBottom: "8px" }}>
-          {(() => {
-            const stars = [];
-            for (let i = 0; i < 5; i++) {
-              stars.push(
-                <span key={i} style={{ color: i < Math.round(product.rating) ? "#f59e0b" : "#d1d5db", fontSize: "18px" }}>
-                  ★
-                </span>
-              );
+    <article aria-labelledby={`product-${product.id}`} className="flex h-[412px] w-full min-w-0 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-md">
+      <div className="relative h-[184px] w-full shrink-0 bg-gray-100">
+        <div className="absolute inset-0 flex items-center justify-center gap-2 text-sm text-gray-600"><ImageOff aria-hidden="true" size={20} /><span>Sin imagen</span></div>
+        <img src={imageSource} alt={imageSource === referenceImage ? "Imagen ilustrativa del catálogo" : `Imagen de referencia de ${product.name}`} width={640} height={368}
+          loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : "auto"} decoding="async" referrerPolicy="no-referrer"
+          onError={(event) => {
+            const image = event.currentTarget;
+            if (image.getAttribute("src") === referenceImage) {
+              image.hidden = true;
+              return;
             }
-            return stars;
-          })()}
-          <span style={{ fontSize: "12px", color: "#6b7280", marginLeft: "6px" }}>
-            ({product.reviews?.length || 0} reseñas)
+            image.src = referenceImage;
+            image.alt = "Imagen ilustrativa del catálogo";
+          }}
+          className="relative h-[184px] w-full object-cover" />
+      </div>
+      <div className="flex min-h-0 flex-1 flex-col p-4">
+        <div className="mb-2 flex items-center justify-between gap-2 text-xs">
+          <p className="truncate font-medium text-brand-700">{product.category}</p>
+          <span className="flex shrink-0 items-center gap-1 text-gray-700" aria-label={`${product.rating} de 5, ${product.reviewCount} reseñas`}>
+            <Star aria-hidden="true" size={13} className="fill-amber-400 text-amber-700" />{product.rating.toFixed(1)}
           </span>
         </div>
-
-        {/* ANTI-PATRÓN: Mostrar demasiada información en la tarjeta */}
-        <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "8px" }}>
-          <p>Stock: {product.stock} unidades</p>
-          <p>Peso: {product.metadata?.weight_kg} kg</p>
-          <p>Dimensiones: {product.metadata?.dimensions_cm?.width} x {product.metadata?.dimensions_cm?.height} x {product.metadata?.dimensions_cm?.depth} cm</p>
-          <p>Color: {product.metadata?.color}</p>
-          <p>Material: {product.metadata?.material}</p>
+        <h2 id={`product-${product.id}`} className="line-clamp-2 h-12 text-base font-semibold leading-6" title={product.name}>{product.name}</h2>
+        <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
+          <p className="text-xl font-semibold tabular-nums">{moneyFormat.format(product.price)}</p>
+          <p className={`text-xs ${product.stock > 0 ? "text-gray-600" : "font-semibold text-red-700"}`}>
+            {product.stock > 0 ? `${numberFormat.format(product.stock)} en stock` : "Agotado"}
+          </p>
         </div>
-
-        {/* ANTI-PATRÓN: Tags como <span> sin key estable, renderizando todo */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "12px" }}>
-          {product.tags?.slice(0, 8).map((tag, idx) => (
-            <span
-              key={idx}
-              style={{
-                background: "#f3f4f6",
-                padding: "2px 8px",
-                borderRadius: "9999px",
-                fontSize: "11px",
-                color: "#374151",
-              }}
-            >
-              #{tag}
-            </span>
-          ))}
-          {product.tags?.length > 8 && (
-            <span style={{ fontSize: "11px", color: "#9ca3af" }}>
-              +{product.tags.length - 8} más
-            </span>
-          )}
-        </div>
-
-        {/* ANTI-PATRÓN: Botón que hace un fetch extra cada vez */}
-        <button
-          onClick={() => {
-            fetch(`http://localhost:8000/api/products/${product.id}/details`)
-              .then((r) => r.json())
-              .then((data) => alert(`Producto: ${data.product.name}\nRelacionados: ${data.related_products.length}`))
-              .catch(() => {});
-          }}
-          style={{
-            width: "100%",
-            padding: "12px",
-            background: "linear-gradient(135deg, #667eea, #764ba2)",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          Ver detalles
+        <button type="button" onClick={() => onSelect(product)} aria-label={`Ver detalles de ${product.name}`} aria-haspopup="dialog" className="control mt-auto w-full justify-between">
+          Ver detalles<ArrowUpRight aria-hidden="true" width={17} height={17} />
         </button>
       </div>
-    </div>
+    </article>
   );
 }
+
+export default memo(ProductCard);
